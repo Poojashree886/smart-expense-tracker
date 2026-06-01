@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Budget View</title>
+</head>
+<body>
+    <h1>My Budgets - Simple View</h1>
+    <p>User ID: <span th:text="${currentUserId}"></span></p>
+    <p>Selected Month: <span th:text="${selectedMonth}"></span></p>
+    <p>Selected Year: <span th:text="${selectedYear}"></span></p>
+    
+    <h2>Budgets (<span th:text="${#lists.size(budgetProgress)}"></span>)</h2>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Budget</th>
+                <th>Spent</th>
+                <th>Remaining</th>
+                <th>% Used</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="budget : ${budgetProgress}">
+                <td th:text="${budget.categoryName}">Category</td>
+                <td th:text="${budget.budgetAmount}">0</td>
+                <td th:text="${budget.spentAmount}">0</td>
+                <td th:text="${budget.remaining}">0</td>
+                <td th:text="${budget.percentage + '%'}">0%</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+</body>
+</html>

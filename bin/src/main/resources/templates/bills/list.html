@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bills - Smart Expense Tracker</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            width: 280px;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .sidebar .logo i {
+            margin-right: 10px;
+            color: #ffd700;
+        }
+        
+        .sidebar .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar .nav-item {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+        }
+        
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card.total {
+            border-left: 4px solid #667eea;
+        }
+        
+        .summary-card.unpaid {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .summary-card.overdue {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* Bills Tabs */
+        .bills-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+        
+        .tab-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Bills Table */
+        .bills-table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .table td {
+            padding: 15px;
+            vertical-align: middle;
+            color: #333;
+        }
+        
+        .badge-overdue {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-due-today {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-upcoming {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-paid {
+            background: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .action-btn {
+            border: none;
+            background: none;
+            color: #666;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+        
+        .action-btn.pay:hover {
+            color: #28a745;
+        }
+        
+        .action-btn.edit:hover {
+            color: #667eea;
+        }
+        
+        .action-btn.delete:hover {
+            color: #dc3545;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            .bills-tabs {
+                flex-wrap: wrap;
+            }
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-wallet"></i>
+            SmartExpense
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fas fa-chart-pie"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/transactions" class="nav-link">
+                    <i class="fas fa-exchange-alt"></i>
+                    Transactions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/budgets" class="nav-link">
+                    <i class="fas fa-tasks"></i>
+                    Budgets
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/bills" class="nav-link active">
+                    <i class="fas fa-file-invoice"></i>
+                    Bills
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/reports" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/profile" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/email-settings" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    Email Alerts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/logout" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <h1 class="page-title">Bills Manager</h1>
+            <a href="/bills/add" class="btn-add">
+                <i class="fas fa-plus-circle"></i>
+                Add New Bill
+            </a>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card total">
+                <div class="summary-label">Total Monthly Bills</div>
+                <div class="summary-value" th:text="${'₹' + #numbers.formatInteger(totalMonthlyBills, 0, 'COMMA')}">₹0</div>
+            </div>
+            
+            <div class="summary-card unpaid">
+                <div class="summary-label">Unpaid Bills</div>
+                <div class="summary-value" th:text="${#lists.size(unpaidBills)}">0</div>
+            </div>
+            
+            <div class="summary-card overdue">
+                <div class="summary-label">Overdue Bills</div>
+                <div class="summary-value" th:text="${#lists.size(overdueBills)}">0</div>
+            </div>
+        </div>
+
+        <!-- Bills Tabs -->
+        <div class="bills-tabs">
+            <button class="tab-btn active" onclick="showTab('all')">All Bills</button>
+            <button class="tab-btn" onclick="showTab('unpaid')">Unpaid</button>
+            <button class="tab-btn" onclick="showTab('paid')">Paid</button>
+            <button class="tab-btn" onclick="showTab('overdue')">Overdue</button>
+        </div>
+
+        <!-- All Bills Table -->
+        <div id="all-bills" class="bills-table-container" style="display: block;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bill Name</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${bills}">
+                        <td th:text="${bill.billName}">Rent</td>
+                        <td th:text="${bill.category != null ? bill.category : '-'}">Housing</td>
+                        <td th:text="${'₹' + #numbers.formatInteger(bill.amount, 0, 'COMMA')}">₹15,000</td>
+                        <td th:text="${#temporals.format(bill.dueDate, 'dd MMM yyyy')}">01 Feb 2026</td>
+                        <td>
+                            <span class="badge-overdue" th:if="${bill.dueDate.isBefore(T(java.time.LocalDate).now()) and !bill.isPaid}">Overdue</span>
+                            <span class="badge-due-today" th:if="${bill.dueDate.equals(T(java.time.LocalDate).now()) and !bill.isPaid}">Due Today</span>
+                            <span class="badge-upcoming" th:if="${bill.dueDate.isAfter(T(java.time.LocalDate).now()) and !bill.isPaid}">Upcoming</span>
+                            <span class="badge-paid" th:if="${bill.isPaid}">Paid</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/bills/mark-paid/' + ${bill.id}}" class="action-btn pay" title="Mark as Paid" th:if="${!bill.isPaid}">
+                                <i class="fas fa-check-circle"></i>
+                            </a>
+                            <a th:href="@{'/bills/edit/' + ${bill.id}}" class="action-btn edit" title="Edit Bill">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{'/bills/delete/' + ${bill.id}}" class="action-btn delete" title="Delete Bill"
+                               onclick="return confirm('Are you sure you want to delete this bill?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(bills)}">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-file-invoice"></i>
+                                <h5>No bills found</h5>
+                                <p class="text-muted">Click "Add New Bill" to create your first bill</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Unpaid Bills Table (hidden by default) -->
+        <div id="unpaid-bills" class="bills-table-container" style="display: none;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bill Name</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${unpaidBills}">
+                        <td th:text="${bill.billName}">Rent</td>
+                        <td th:text="${bill.category != null ? bill.category : '-'}">Housing</td>
+                        <td th:text="${'₹' + #numbers.formatInteger(bill.amount, 0, 'COMMA')}">₹15,000</td>
+                        <td th:text="${#temporals.format(bill.dueDate, 'dd MMM yyyy')}">01 Feb 2026</td>
+                        <td>
+                            <span class="badge-overdue" th:if="${bill.dueDate.isBefore(T(java.time.LocalDate).now())}">Overdue</span>
+                            <span class="badge-due-today" th:if="${bill.dueDate.equals(T(java.time.LocalDate).now())}">Due Today</span>
+                            <span class="badge-upcoming" th:if="${bill.dueDate.isAfter(T(java.time.LocalDate).now())}">Upcoming</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/bills/mark-paid/' + ${bill.id}}" class="action-btn pay" title="Mark as Paid">
+                                <i class="fas fa-check-circle"></i>
+                            </a>
+                            <a th:href="@{'/bills/edit/' + ${bill.id}}" class="action-btn edit" title="Edit Bill">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{'/bills/delete/' + ${bill.id}}" class="action-btn delete" title="Delete Bill"
+                               onclick="return confirm('Are you sure you want to delete this bill?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paid Bills Table (hidden by default) -->
+        <div id="paid-bills" class="bills-table-container" style="display: none;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bill Name</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Paid Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${bills}" th:if="${bill.isPaid}">
+                        <td th:text="${bill.billName}">Rent</td>
+                        <td th:text="${bill.category != null ? bill.category : '-'}">Housing</td>
+                        <td th:text="${'₹' + #numbers.formatInteger(bill.amount, 0, 'COMMA')}">₹15,000</td>
+                        <td th:text="${bill.paidDate != null ? #temporals.format(bill.paidDate, 'dd MMM yyyy') : '-'}">01 Feb 2026</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>
+                            <a th:href="@{'/bills/edit/' + ${bill.id}}" class="action-btn edit" title="Edit Bill">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{'/bills/delete/' + ${bill.id}}" class="action-btn delete" title="Delete Bill"
+                               onclick="return confirm('Are you sure you want to delete this bill?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Overdue Bills Table (hidden by default) -->
+        <div id="overdue-bills" class="bills-table-container" style="display: none;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bill Name</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Due Date</th>
+                        <th>Days Overdue</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${overdueBills}">
+                        <td th:text="${bill.billName}">Rent</td>
+                        <td th:text="${bill.category != null ? bill.category : '-'}">Housing</td>
+                        <td th:text="${'₹' + #numbers.formatInteger(bill.amount, 0, 'COMMA')}">₹15,000</td>
+                        <td th:text="${#temporals.format(bill.dueDate, 'dd MMM yyyy')}">01 Feb 2026</td>
+                        <td><span class="badge-overdue" th:text="${T(java.time.LocalDate).now().until(bill.dueDate).days * -1 + ' days'}">5 days</span></td>
+                        <td>
+                            <a th:href="@{'/bills/mark-paid/' + ${bill.id}}" class="action-btn pay" title="Mark as Paid">
+                                <i class="fas fa-check-circle"></i>
+                            </a>
+                            <a th:href="@{'/bills/edit/' + ${bill.id}}" class="action-btn edit" title="Edit Bill">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{'/bills/delete/' + ${bill.id}}" class="action-btn delete" title="Delete Bill"
+                               onclick="return confirm('Are you sure you want to delete this bill?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showTab(tabName) {
+            // Hide all tables
+            document.getElementById('all-bills').style.display = 'none';
+            document.getElementById('unpaid-bills').style.display = 'none';
+            document.getElementById('paid-bills').style.display = 'none';
+            document.getElementById('overdue-bills').style.display = 'none';
+            
+            // Show selected table
+            document.getElementById(tabName + '-bills').style.display = 'block';
+            
+            // Update active tab
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

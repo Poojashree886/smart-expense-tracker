@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Smart Expense Tracker</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .register-wrapper {
+            display: flex;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Left Side - Image & Branding */
+        .register-left {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            animation: shine 10s infinite linear;
+        }
+
+        @keyframes shine {
+            from {
+                transform: rotate(45deg) translateX(-100%);
+            }
+            to {
+                transform: rotate(45deg) translateX(100%);
+            }
+        }
+
+        .brand-icon {
+            font-size: 60px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .brand-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-tagline {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .benefits-list {
+            list-style: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            animation: fadeInLeft 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .benefit-item:nth-child(1) { animation-delay: 0.2s; }
+        .benefit-item:nth-child(2) { animation-delay: 0.4s; }
+        .benefit-item:nth-child(3) { animation-delay: 0.6s; }
+        .benefit-item:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .benefit-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .benefit-text {
+            font-size: 16px;
+        }
+
+        /* Right Side - Register Form */
+        .register-right {
+            flex: 1.2;
+            padding: 60px 50px;
+            background: white;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-header p a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .form-header p a:hover {
+            color: #764ba2;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .input-icon:hover {
+            color: #667eea;
+        }
+
+        /* Currency Select */
+        .currency-select {
+            display: flex;
+            gap: 15px;
+        }
+
+        .currency-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .currency-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .currency-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .currency-option input[type="radio"]:checked + .currency-label {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .currency-label:hover {
+            border-color: #667eea;
+        }
+
+        /* Password Strength */
+        .password-strength {
+            margin-top: 10px;
+        }
+
+        .strength-bar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .strength-segment {
+            height: 4px;
+            flex: 1;
+            background: #e0e0e0;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .strength-segment.active.weak {
+            background: #dc3545;
+        }
+
+        .strength-segment.active.medium {
+            background: #ffc107;
+        }
+
+        .strength-segment.active.strong {
+            background: #28a745;
+        }
+
+        .strength-text {
+            font-size: 13px;
+        }
+
+        /* Terms Checkbox */
+        .terms-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .terms-checkbox label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .terms-checkbox a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-checkbox a:hover {
+            color: #764ba2;
+        }
+
+        /* Register Button */
+        .btn-register {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-register:hover::before {
+            left: 100%;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-register i {
+            font-size: 18px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .btn-register.loading .spinner {
+            display: inline-block;
+        }
+
+        .btn-register.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .register-wrapper {
+                flex-direction: column;
+            }
+            
+            .register-left {
+                padding: 40px;
+            }
+            
+            .register-right {
+                padding: 40px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-right {
+                padding: 30px 20px;
+            }
+            
+            .form-header h2 {
+                font-size: 28px;
+            }
+            
+            .currency-select {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-wrapper">
+            <!-- Left Side - Branding -->
+            <div class="register-left">
+                <div class="brand-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h1 class="brand-title">Smart Expense Tracker</h1>
+                <p class="brand-tagline">Join thousands of smart savers!</p>
+                
+                <ul class="benefits-list">
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="benefit-text">Free forever - No hidden charges</div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="benefit-text">Track expenses on the go</div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="benefit-text">Detailed insights & reports</div>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="benefit-text">Bank-level security</div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right Side - Register Form -->
+            <div class="register-right">
+                <div class="form-header">
+                    <h2>Create Account 🚀</h2>
+                    <p>Already have an account? <a href="/login">Sign in here</a></p>
+                </div>
+
+                <!-- Error Message -->
+                <div th:if="${error}" class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span th:text="${error}">Error message here</span>
+                </div>
+
+                <!-- Register Form -->
+                <form action="/register" method="post" id="registerForm">
+                    <div class="form-grid">
+                        <!-- Full Name -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>Full Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="fullName" 
+                                   placeholder="John Doe"
+                                   required>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user-tag"></i>Username
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="username" 
+                                   placeholder="johndoe123"
+                                   required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i>Email Address
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   name="email" 
+                                   placeholder="john@example.com"
+                                   required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       name="password" 
+                                       id="password"
+                                       placeholder="Create password"
+                                       onkeyup="checkPasswordStrength()"
+                                       required>
+                                <i class="fas fa-eye input-icon" id="togglePassword" onclick="togglePassword()"></i>
+                            </div>
+                            
+                            <!-- Password Strength -->
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-segment" id="strength1"></div>
+                                    <div class="strength-segment" id="strength2"></div>
+                                    <div class="strength-segment" id="strength3"></div>
+                                </div>
+                                <div class="strength-text" id="strengthText"></div>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle"></i>Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       name="confirmPassword" 
+                                       id="confirmPassword"
+                                       placeholder="Re-enter password"
+                                       onkeyup="checkPasswordMatch()"
+                                       required>
+                                <i class="fas fa-eye input-icon" id="toggleConfirmPassword" onclick="toggleConfirmPassword()"></i>
+                            </div>
+                            <small class="text-muted" id="passwordMatchMsg"></small>
+                        </div>
+
+                        <!-- Currency Preference -->
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-money-bill-wave"></i>Preferred Currency
+                            </label>
+                            <div class="currency-select">
+                                <div class="currency-option">
+                                    <input type="radio" name="currency" value="INR" id="currencyINR" checked>
+                                    <label for="currencyINR" class="currency-label">
+                                        <i class="fas fa-rupee-sign"></i> INR
+                                    </label>
+                                </div>
+                                <div class="currency-option">
+                                    <input type="radio" name="currency" value="USD" id="currencyUSD">
+                                    <label for="currencyUSD" class="currency-label">
+                                        <i class="fas fa-dollar-sign"></i> USD
+                                    </label>
+                                </div>
+                                <div class="currency-option">
+                                    <input type="radio" name="currency" value="EUR" id="currencyEUR">
+                                    <label for="currencyEUR" class="currency-label">
+                                        <i class="fas fa-euro-sign"></i> EUR
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="terms-checkbox">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button type="submit" class="btn-register" id="registerBtn">
+                        <span class="spinner"></span>
+                        <span class="btn-text">
+                            <i class="fas fa-user-plus"></i>
+                            Create Account
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Login Link -->
+                <p class="text-center mt-4">
+                    Already have an account? <a href="/login" class="text-primary">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Toggle Password Visibility
+        function togglePassword() {
+            const password = document.getElementById('password');
+            const icon = document.getElementById('togglePassword');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function toggleConfirmPassword() {
+            const password = document.getElementById('confirmPassword');
+            const icon = document.getElementById('toggleConfirmPassword');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Check Password Strength
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strength1 = document.getElementById('strength1');
+            const strength2 = document.getElementById('strength2');
+            const strength3 = document.getElementById('strength3');
+            const strengthText = document.getElementById('strengthText');
+            
+            // Reset classes
+            [strength1, strength2, strength3].forEach(el => {
+                el.classList.remove('active', 'weak', 'medium', 'strong');
+            });
+
+            if (!password) {
+                strengthText.innerHTML = '';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/) && password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            if (strength >= 1) {
+                strength1.classList.add('active', 'weak');
+            }
+            if (strength >= 2) {
+                strength2.classList.add('active', 'medium');
+            }
+            if (strength >= 3) {
+                strength3.classList.add('active', 'strong');
+            }
+
+            const texts = ['Weak', 'Medium', 'Strong'];
+            const colors = ['#dc3545', '#ffc107', '#28a745'];
+            strengthText.innerHTML = texts[strength - 1] || '';
+            strengthText.style.color = colors[strength - 1] || '';
+        }
+
+        // Check Password Match
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const msg = document.getElementById('passwordMatchMsg');
+
+            if (confirm) {
+                if (password === confirm) {
+                    msg.innerHTML = '<i class="fas fa-check-circle text-success"></i> Passwords match';
+                    msg.style.color = '#28a745';
+                } else {
+                    msg.innerHTML = '<i class="fas fa-exclamation-circle text-danger"></i> Passwords do not match';
+                    msg.style.color = '#dc3545';
+                }
+            } else {
+                msg.innerHTML = '';
+            }
+        }
+
+        // Form Validation
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const terms = document.getElementById('terms').checked;
+
+            if (password !== confirm) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+
+            if (!terms) {
+                e.preventDefault();
+                alert('Please accept the Terms and Conditions');
+                return;
+            }
+
+            document.getElementById('registerBtn').classList.add('loading');
+        });
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
